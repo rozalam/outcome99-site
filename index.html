@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Outcome99 — Capital for your next project. Done for you.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="preload" href="fonts/Geist-Regular.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="fonts/Geist-Medium.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="hero.mp4" as="video" type="video/mp4" />
+<link href="https://fonts.googleapis.com/css2?family=Host+Grotesk:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet" />
+<style>
+  @font-face { font-family: 'Geist'; src: url('fonts/Geist-Light.woff2') format('woff2'); font-weight: 300; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Geist'; src: url('fonts/Geist-Regular.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Geist'; src: url('fonts/Geist-Medium.woff2') format('woff2'); font-weight: 500; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Geist'; src: url('fonts/Geist-SemiBold.woff2') format('woff2'); font-weight: 600; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Geist'; src: url('fonts/Geist-Bold.woff2') format('woff2'); font-weight: 700; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Geist'; src: url('fonts/Geist-Black.woff2') format('woff2'); font-weight: 900; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Geist'; src: url('fonts/Geist-Italic.woff2') format('woff2'); font-weight: 400; font-style: italic; font-display: swap; }
+</style>
+<style>
+  :root {
+    --bg: #0a0a0b;
+    --bg-soft: #111113;
+    --ink: #f5f3ee;
+    --ink-dim: rgba(245, 243, 238, 0.55);
+    --ink-faint: rgba(245, 243, 238, 0.22);
+    --accent: #c8a567;
+    --line: rgba(245, 243, 238, 0.12);
+    --serif: 'Host Grotesk', -apple-system, sans-serif;
+    --sans: 'Geist', -apple-system, sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-weight: 300;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ───── Top Bar ───── */
+  .topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 80px;
+    padding: 0 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 50;
+    background: linear-gradient(to bottom, rgba(10,10,11,0.7), transparent);
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 22px;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+  }
+
+  .brand-logo {
+    width: 32px;
+    height: 32px;
+    display: block;
+    fill: var(--ink);
+  }
+
+  /* ───── Preloader / intro ───── */
+  #preloader {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* the overlay fades out only after the logo has flown to its spot */
+    transition: opacity 0.5s ease;
+  }
+  #preloader-logo {
+    width: 128px;
+    height: 128px;
+    fill: var(--ink);
+    transform-origin: top left;
+    will-change: transform;
+    /* JS sets --tx/--ty/--scale to land exactly on the top-bar logo */
+    transform: translate(var(--start-x, 0px), var(--start-y, 0px)) scale(1);
+  }
+  /* Phase 2: travel to the top-left brand position */
+  #preloader.dock #preloader-logo {
+    transition: transform 0.85s cubic-bezier(0.65, 0, 0.2, 1);
+    transform: translate(var(--tx, 0px), var(--ty, 0px)) scale(var(--scale, 0.25));
+  }
+  /* Phase 3: fade the black overlay away */
+  #preloader.done {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+  /* The real top-bar logo + wordmark stay invisible until handoff */
+  .brand-logo, .brand span {
+    opacity: 0;
+    transition: opacity 0.35s ease;
+  }
+  body.intro-complete .brand-logo,
+  body.intro-complete .brand span {
+    opacity: 1;
+  }
+  /* the wordmark eases in just as the flying logo lands */
+  .brand span { transition-delay: 0.15s; }
+
+  .menu {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: opacity 0.3s;
+  }
+  .menu:hover { opacity: 0.7; }
+  .menu-lines { display: flex; flex-direction: column; gap: 5px; }
+  .menu-lines span { display: block; width: 22px; height: 1px; background: var(--ink); transition: transform 0.3s ease, opacity 0.3s ease; }
+  .menu[aria-expanded="true"] .menu-lines span:first-child { transform: translateY(3px) rotate(45deg); }
+  .menu[aria-expanded="true"] .menu-lines span:last-child { transform: translateY(-3px) rotate(-45deg); }
+
+  /* ───── Nav overlay (quick directory) ───── */
+  #navOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 45;
+    background: rgba(8, 8, 9, 0.96);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.45s ease, visibility 0s linear 0.45s;
+  }
+  #navOverlay.open {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.45s ease;
+  }
+  .nav-list {
+    list-style: none;
+    margin: 0;
+    padding: 0 8vw;
+    width: 100%;
+    max-width: 900px;
+  }
+  .nav-item {
+    width: 100%;
+    background: none;
+    border: none;
+    border-top: 1px solid var(--line);
+    padding: 22px 4px;
+    display: flex;
+    align-items: baseline;
+    gap: 28px;
+    cursor: pointer;
+    color: var(--ink-dim);
+    text-align: left;
+    transition: color 0.3s ease, padding-left 0.3s ease;
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  .nav-list li:last-child .nav-item { border-bottom: 1px solid var(--line); }
+  #navOverlay.open .nav-item { opacity: 1; transform: translateY(0); transition: color 0.3s ease, padding-left 0.3s ease, opacity 0.5s ease, transform 0.5s cubic-bezier(0.22,1,0.36,1); }
+  #navOverlay.open li:nth-child(1) .nav-item { transition-delay: 0.06s; }
+  #navOverlay.open li:nth-child(2) .nav-item { transition-delay: 0.12s; }
+  #navOverlay.open li:nth-child(3) .nav-item { transition-delay: 0.18s; }
+  #navOverlay.open li:nth-child(4) .nav-item { transition-delay: 0.24s; }
+  #navOverlay.open li:nth-child(5) .nav-item { transition-delay: 0.30s; }
+  #navOverlay.open li:nth-child(6) .nav-item { transition-delay: 0.36s; }
+  .nav-item:hover, .nav-item:focus-visible { color: var(--ink); padding-left: 16px; outline: none; }
+  .nav-item.current { color: var(--ink); }
+  .nav-item.current .nav-num { color: var(--accent, rgba(200,165,103,0.9)); }
+  .nav-num {
+    font-family: var(--sans);
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    color: var(--ink-faint);
+    flex: 0 0 auto;
+  }
+  .nav-label {
+    font-family: var(--serif);
+    font-size: clamp(28px, 5vw, 52px);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+  @media (max-width: 700px) {
+    .nav-item { gap: 16px; padding: 16px 2px; }
+    .nav-num { font-size: 11px; }
+  }
+
+  /* ───── Horizontal Track ───── */
+  .track {
+    display: flex;
+    align-items: center;
+    height: 100vh;
+    width: max-content;
+    background: #000;
+    will-change: transform;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .slide {
+    width: 100vw;
+    height: min(100vh, 56.25vw); /* 16:9 stage; ink-black bars fill the rest of the 100vh track */
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ───── Slide 1: Hero ───── */
+  .slide-hero { background: var(--bg); }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 50% 65%, rgba(40, 50, 70, 0.4) 0%, transparent 60%),
+      linear-gradient(180deg, #1a1f2a 0%, #0d1117 45%, #050608 100%);
+  }
+
+  .hero-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+  }
+
+  .hero-skyline {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 55%;
+    opacity: 0.85;
+  }
+
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.75) 100%);
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 8vw;
+    text-align: center;
+  }
+
+  .hero-statement {
+    font-family: var(--serif);
+    font-weight: 300;
+    font-size: clamp(40px, 5.8vw, 96px);
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+    max-width: 1200px;
+    color: var(--ink);
+  }
+  .hero-statement em {
+    font-style: italic;
+    font-weight: 300;
+    color: var(--accent);
+  }
+  .hero-sub {
+    margin-top: 32px;
+    font-family: var(--sans);
+    font-size: 14px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+  }
+
+  /* ───── Slide 2: VSL ───── */
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(245, 243, 238, 0.4); }
+    70% { box-shadow: 0 0 0 30px rgba(245, 243, 238, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(245, 243, 238, 0); }
+  }
+  .vsl-frame:hover
+  .vsl-play svg {
+    width: 28px; height: 28px;
+    margin-left: 4px;
+  }
+
+  /* ───── Reusable ───── */
+  .eyebrow {
+    font-family: var(--sans);
+    font-size: 11px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .eyebrow::before {
+    content: '';
+    width: 32px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  .section-title {
+    font-family: var(--serif);
+    font-weight: 300;
+    font-size: clamp(40px, 4.2vw, 68px);
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+    margin-bottom: 32px;
+  }
+  .section-title em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .section-body {
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--ink-dim);
+    max-width: 480px;
+    font-weight: 300;
+  }
+
+  /* ───── Slide 3: How It Works ───── */
+  .slide-how {
+    background: var(--bg);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    padding: 0 8vw;
+    gap: 6vw;
+  }
+
+  .pillars {
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid var(--line);
+  }
+
+  .pillar {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: 24px;
+    padding: 22px 0;
+    border-bottom: 1px solid var(--line);
+    align-items: baseline;
+  }
+
+  .pillar-num {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 14px;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+  }
+
+  .pillar-title {
+    font-family: var(--serif);
+    font-size: 22px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    margin-bottom: 6px;
+  }
+
+  .pillar-desc {
+    font-size: 14px;
+    color: var(--ink-dim);
+    line-height: 1.6;
+  }
+
+  /* ───── Slide 4: Traction ───── */
+  .slide-traction {
+    background: var(--bg-soft);
+    padding: 0 8vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .traction-header { margin-bottom: 64px; max-width: 800px; }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .stat {
+    padding: 48px 32px 48px 0;
+    border-right: 1px solid var(--line);
+  }
+  .stat:last-child { border-right: none; }
+  .stat:not(:first-child) { padding-left: 32px; }
+
+  .stat-num {
+    font-family: var(--serif);
+    font-weight: 300;
+    font-size: clamp(48px, 5.5vw, 88px);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    color: var(--ink);
+    margin-bottom: 16px;
+  }
+  .stat-num .unit {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 0.45em;
+    color: var(--accent);
+    margin-left: 4px;
+    vertical-align: top;
+  }
+  .stat-label {
+    font-family: var(--sans);
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    line-height: 1.5;
+  }
+
+  /* ───── Slide 5: Who ───── */
+  .slide-who {
+    background: var(--bg);
+    padding: 0 8vw;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6vw;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .who-skyline {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: clamp(120px, 18vh, 220px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .who-skyline svg { display: block; width: 100%; height: 100%; }
+  .who-skyline path,
+  .who-skyline line,
+  .who-skyline rect,
+  .who-skyline polyline {
+    fill: none;
+    stroke: var(--gold, rgba(200, 165, 103, 0.55));
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+  }
+  .slide-who > div,
+  .slide-who > .who-tags { position: relative; z-index: 1; }
+
+  .who-tags { display: flex; flex-direction: column; }
+  .tag-group { padding: 24px 0; border-top: 1px solid var(--line); }
+  .tag-group:last-child { border-bottom: 1px solid var(--line); }
+  .tag-label {
+    font-family: var(--sans);
+    font-size: 11px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 14px;
+  }
+  .tag-row {
+    font-family: var(--serif);
+    font-size: 18px;
+    color: var(--ink);
+    line-height: 1.6;
+  }
+  .tag-row span { color: var(--ink-dim); margin: 0 10px; }
+
+  /* ───── Slide 6: CTA ───── */
+  .slide-contact {
+    background: var(--bg);
+    padding: 0 8vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .contact-statement {
+    font-family: var(--serif);
+    font-weight: 300;
+    font-size: clamp(40px, 5vw, 84px);
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+    max-width: 1000px;
+    margin-bottom: 56px;
+  }
+  .contact-statement em { font-style: italic; color: var(--accent); }
+
+  .cta-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 20px;
+    padding: 22px 36px;
+    background: var(--ink);
+    color: var(--bg);
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 999px;
+    transition: all 0.4s cubic-bezier(0.65, 0, 0.35, 1);
+    align-self: flex-start;
+  }
+  .cta-button:hover {
+    background: var(--accent);
+    transform: translateX(8px);
+  }
+  .cta-button svg { width: 18px; height: 18px; }
+
+  .contact-foot {
+    margin-top: 72px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 80px;
+    max-width: 900px;
+    padding-top: 36px;
+    border-top: 1px solid var(--line);
+  }
+  .contact-label {
+    font-size: 11px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 14px;
+  }
+  .contact-value {
+    font-family: var(--serif);
+    font-size: 18px;
+    color: var(--ink);
+  }
+  .contact-value a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid var(--ink-faint);
+    transition: border-color 0.3s;
+  }
+  .contact-value a:hover { border-color: var(--accent); }
+
+  /* ───── Controls ───── */
+  .controls {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 0 48px 32px;
+    z-index: 50;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    pointer-events: none;
+  }
+
+  .progress {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    pointer-events: auto;
+    margin-bottom: 18px;
+  }
+
+  .progress-bar {
+    width: 60px;
+    height: 1px;
+    background: var(--ink-faint);
+    cursor: pointer;
+    transition: background 0.4s;
+  }
+  .progress-bar.active { background: var(--ink); }
+  .progress-bar:hover { background: var(--ink-dim); }
+  .progress-bar { position: relative; }
+  .progress-bar::after {
+    content: attr(data-label);
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    white-space: nowrap;
+    font-family: var(--sans);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    background: rgba(8,8,9,0.9);
+    padding: 5px 9px;
+    border-radius: 3px;
+    border: 1px solid var(--line);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+  .progress-bar:hover::after { opacity: 1; transform: translateX(-50%) translateY(0); }
+  @media (max-width: 700px) {
+    .progress-bar::after { display: none; }
+  }
+
+  .slide-counter {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 13px;
+    color: var(--ink-dim);
+    margin-left: 18px;
+  }
+  .slide-counter .current { color: var(--ink); font-style: normal; }
+
+  .nav-arrow {
+    pointer-events: auto;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--bg);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.65, 0, 0.35, 1);
+    font-size: 20px;
+  }
+  .nav-arrow:hover { background: var(--accent); transform: scale(1.05); }
+  .nav-arrow:disabled { opacity: 0.25; cursor: not-allowed; }
+  .nav-group { display: flex; gap: 12px; }
+
+  /* ───── Footer ───── */
+  .footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 14px 48px;
+    background: rgba(5, 6, 8, 0.85);
+    backdrop-filter: blur(8px);
+    border-top: 1px solid var(--line);
+    z-index: 40;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  .slide-mark {
+    position: absolute;
+    top: 50%;
+    left: 36px;
+    transform: translateY(-50%) rotate(-90deg);
+    transform-origin: left center;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 12px;
+    color: var(--ink-faint);
+    letter-spacing: 0.2em;
+    white-space: nowrap;
+  }
+
+  .slide.active .reveal {
+    animation: reveal 1.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .slide.active .reveal:nth-child(2) { animation-delay: 0.15s; }
+  .slide.active .reveal:nth-child(3) { animation-delay: 0.3s; }
+  .slide.active .reveal:nth-child(4) { animation-delay: 0.45s; }
+  @keyframes reveal {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 900px) {
+    .topbar { padding: 0 24px; height: 64px; }
+    .controls { padding: 0 20px 24px; }
+    .footer { padding: 12px 20px; }
+    .slide-mark { display: none; }
+    .slide-how { grid-template-columns: 1fr; gap: 40px; padding: 100px 24px 140px; }
+    .slide-traction { padding: 100px 24px 140px; }
+    .stats { grid-template-columns: 1fr 1fr; }
+    .stat:nth-child(2) { border-right: none; }
+    .stat:nth-child(3) { padding-left: 0; padding-right: 32px; }
+    .slide-who { grid-template-columns: 1fr; padding: 100px 24px 140px; gap: 40px; }
+    .slide-contact { padding: 100px 24px 140px; }
+    .contact-foot { grid-template-columns: 1fr; gap: 32px; margin-top: 48px; }
+    .hero-statement { font-size: 42px; }
+    .section-title { font-size: 38px; }
+    .contact-statement { font-size: 42px; }
+    .progress-bar { width: 24px; }
+  }
+
+  /* ───── Phones: switch from 16:9 horizontal deck to full-height swipe panels ───── */
+  @media (max-width: 700px) {
+    /* allow native vertical scroll inside each panel if content is tall */
+    html, body { overflow: hidden; }
+
+    .track {
+      align-items: stretch;
+      height: 100dvh;
+    }
+
+    /* Each slide becomes a true full-screen panel, scrollable internally */
+    .slide {
+      width: 100vw;
+      height: 100dvh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Generic vertical-stack layout for the grid/flex slides */
+    .slide-vsl,
+    .slide-how,
+    .slide-who {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 28px;
+      padding: 92px 22px 120px;
+      min-height: 100dvh;
+    }
+    .slide-traction,
+    .slide-contact {
+      justify-content: center;
+      padding: 92px 22px 120px;
+      min-height: 100dvh;
+    }
+    .slide-hero { padding: 92px 22px 120px; }
+
+    /* Typography scaled for narrow viewports */
+    .hero-statement { font-size: clamp(34px, 11vw, 46px); line-height: 1.05; }
+    .hero-sub { font-size: 15px; }
+    .section-title { font-size: clamp(28px, 8.5vw, 36px); line-height: 1.1; }
+    .section-body { font-size: 15px; line-height: 1.6; }
+    .contact-statement { font-size: clamp(34px, 11vw, 46px); line-height: 1.08; }
+
+    /* Top bar / brand */
+    .topbar { height: 56px; padding: 0 18px; }
+    .brand { font-size: 18px; gap: 10px; }
+    .brand-logo { width: 26px; height: 26px; }
+    .menu span:not(.menu-lines span) { display: none; }
+
+    /* Pillars (How it works) — comfortable spacing */
+    .pillars { gap: 22px; }
+    .pillar { gap: 14px; }
+    .pillar-title { font-size: 17px; }
+    .pillar-desc { font-size: 14px; line-height: 1.5; }
+
+    /* Stats (Proof) — keep 2-up but tighten */
+    .stats { grid-template-columns: 1fr 1fr; gap: 28px 16px; }
+    .stat { padding: 0 !important; border: none !important; }
+    .stat-num { font-size: clamp(44px, 16vw, 64px); }
+    .stat-label { font-size: 11px; }
+
+    /* Who tags */
+    .tag-row { font-size: 16px; }
+    .tag-group { padding: 18px 0; }
+
+    /* Skyline — shorter so it doesn't crowd the stacked text */
+    .who-skyline { height: clamp(80px, 14vh, 120px); opacity: 0.7; }
+
+    /* Contact footer */
+    .contact-foot { margin-top: 40px; gap: 24px; padding-top: 28px; }
+    .cta-button { width: 100%; justify-content: center; }
+    .cta-button:hover { transform: none; }
+
+    /* Controls: stack progress above arrows, make arrows thumb-sized */
+    .controls {
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      padding: 0 18px calc(20px + env(safe-area-inset-bottom));
+    }
+    .progress { margin-bottom: 0; gap: 5px; }
+    .progress-bar { width: 18px; }
+    .slide-counter { font-size: 12px; margin-left: 12px; }
+    .nav-group { gap: 16px; }
+    .nav-arrow { width: 56px; height: 56px; font-size: 22px; }
+    .nav-arrow:hover { transform: none; }
+
+    /* Footer: hide the long disclaimer line, keep it from covering controls */
+    .footer { padding: 10px 18px calc(10px + env(safe-area-inset-bottom)); font-size: 9px; }
+    .footer span:last-child { display: none; }
+
+    /* Background grain is heavy on mobile GPUs — soften */
+    body::after { opacity: 0.03; }
+  }
+
+  /* Honor reduced-motion preference */
+  @media (prefers-reduced-motion: reduce) {
+    .track { transition: none; }
+    .slide.active .reveal { animation: none; }
+    #preloader.dock #preloader-logo { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- PRELOADER -->
+<div id="preloader" aria-hidden="true">
+  <svg id="preloader-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Outcome99 loading">
+    <defs>
+      <mask id="cutout-load">
+        <rect width="100" height="100" fill="white"/>
+        <circle cx="30" cy="30" r="11" fill="black">
+          <animate attributeName="r" values="0;14;9.5;11.5;11" keyTimes="0;0.45;0.7;0.88;1" dur="0.9s" begin="0.25s" fill="freeze" calcMode="spline" keySplines="0.34 1.56 0.64 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1"/>
+        </circle>
+        <circle cx="70" cy="70" r="11" fill="black">
+          <animate attributeName="r" values="0;14;9.5;11.5;11" keyTimes="0;0.45;0.7;0.88;1" dur="0.9s" begin="0.5s" fill="freeze" calcMode="spline" keySplines="0.34 1.56 0.64 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1"/>
+        </circle>
+        <rect x="42" y="8" width="16" height="84" rx="8" fill="black" transform="rotate(30 50 50)">
+          <animate attributeName="y" values="-90;12;6;8" keyTimes="0;0.6;0.82;1" dur="1s" begin="0.1s" fill="freeze" calcMode="spline" keySplines="0.22 1 0.36 1;0.4 0 0.6 1;0.4 0 0.6 1"/>
+        </rect>
+      </mask>
+    </defs>
+    <rect width="100" height="100" rx="16" mask="url(#cutout-load)"/>
+  </svg>
+</div>
+
+<!-- TOP BAR -->
+<header class="topbar">
+  <div class="brand">
+    <svg class="brand-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Outcome99">
+      <defs>
+        <mask id="cutout">
+          <rect width="100" height="100" fill="white"/>
+          <circle cx="30" cy="30" r="11" fill="black"/>
+          <circle cx="70" cy="70" r="11" fill="black"/>
+          <rect x="42" y="8" width="16" height="84" rx="8" fill="black" transform="rotate(30 50 50)"/>
+        </mask>
+      </defs>
+      <rect width="100" height="100" rx="16" mask="url(#cutout)"/>
+    </svg>
+    <span>Outcome99</span>
+  </div>
+  <div class="menu" id="menuToggle" role="button" tabindex="0" aria-haspopup="true" aria-expanded="false" aria-controls="navOverlay">
+    <span>Menu</span>
+    <div class="menu-lines"><span></span><span></span></div>
+  </div>
+</header>
+
+<!-- NAV OVERLAY (quick directory) -->
+<nav id="navOverlay" aria-label="Slide navigation" aria-hidden="true">
+  <ol class="nav-list">
+    <li><button class="nav-item" data-i="0"><span class="nav-num">01</span><span class="nav-label">Welcome</span></button></li>
+    <li><button class="nav-item" data-i="1"><span class="nav-num">02</span><span class="nav-label">How It Works</span></button></li>
+    <li><button class="nav-item" data-i="2"><span class="nav-num">03</span><span class="nav-label">Proof</span></button></li>
+    <li><button class="nav-item" data-i="3"><span class="nav-num">04</span><span class="nav-label">Who We Work With</span></button></li>
+    <li><button class="nav-item" data-i="4"><span class="nav-num">05</span><span class="nav-label">Begin</span></button></li>
+  </ol>
+</nav>
+
+<!-- HORIZONTAL TRACK -->
+<div class="track" id="track">
+
+  <!-- SLIDE 1: HERO -->
+  <section class="slide slide-hero active">
+    <video class="hero-video" autoplay muted loop playsinline><source src="hero.mp4" type="video/mp4"></video>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div>
+        <h1 class="hero-statement reveal">
+          Capital for your next project.<br/>
+          <em>Done for you.</em>
+        </h1>
+        <div class="hero-sub reveal">Investor outreach · Term sheets · Closed deals</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 2: HOW IT WORKS -->
+  <section class="slide slide-how">
+    <div>
+      <h2 class="section-title reveal">A capital raise, <em>fully managed</em>.</h2>
+      <p class="section-body reveal">
+        We build the materials, run the outreach, and book the meetings. You send us your documents, take the calls, and close the deal. Everything in between is handled.
+      </p>
+    </div>
+    <div class="pillars reveal">
+      <div class="pillar">
+        <div class="pillar-num">i. Build</div>
+        <div>
+          <div class="pillar-title">Your institutional data room</div>
+          <div class="pillar-desc">30+ documents, institutional grade, assembled by our team.</div>
+        </div>
+      </div>
+      <div class="pillar">
+        <div class="pillar-num">ii. Match</div>
+        <div>
+          <div class="pillar-title">Investors from our database</div>
+          <div class="pillar-desc">Our database, narrowed to fits for your deal.</div>
+        </div>
+      </div>
+      <div class="pillar">
+        <div class="pillar-num">iii. Outreach</div>
+        <div>
+          <div class="pillar-title">1,000 contacts a day on your behalf</div>
+          <div class="pillar-desc">Senders, sequences, and follow-ups run for you at scale.</div>
+        </div>
+      </div>
+      <div class="pillar">
+        <div class="pillar-num">iv. Book</div>
+        <div>
+          <div class="pillar-title">Qualified meetings to your calendar</div>
+          <div class="pillar-desc">Only investors with capital, mandate, and intent reach your inbox.</div>
+        </div>
+      </div>
+      <div class="pillar">
+        <div class="pillar-num">v. Support</div>
+        <div>
+          <div class="pillar-title">Through term sheet and close</div>
+          <div class="pillar-desc">Strategic backing from first meeting to wired funds.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 3: TRACTION -->
+  <section class="slide slide-traction">
+    <div class="traction-header">
+      <h2 class="section-title reveal"><em>$500M+</em> raised. Term sheets in weeks, not quarters.</h2>
+    </div>
+    <div class="stats reveal">
+      <div class="stat">
+        <div class="stat-num">500<span class="unit">M+</span></div>
+        <div class="stat-label">Capital raised<br/>for clients</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">11</div>
+        <div class="stat-label">Days to<br/>first meeting</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">7</div>
+        <div class="stat-label">Investor meetings<br/>per month</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">2<span class="unit">wks</span></div>
+        <div class="stat-label">To fastest<br/>term sheet</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 4: WHO -->
+  <section class="slide slide-who">
+    <div>
+      <h2 class="section-title reveal">Real estate developers raising <em>$250K to $100M</em>.</h2>
+      <p class="section-body reveal">
+        Also operators in private equity, venture, credit, and other asset-backed deals — raising debt, growth equity, or PE capital.
+      </p>
+    </div>
+    <div class="who-tags reveal">
+      <div class="tag-group">
+        <div class="tag-label">Deal Types — Real Estate</div>
+        <div class="tag-row">Acquisition <span>·</span> Development <span>·</span> Construction <span>·</span> Refinance</div>
+      </div>
+      <div class="tag-group">
+        <div class="tag-label">Capital Structures</div>
+        <div class="tag-row">Bridge <span>·</span> Mezzanine <span>·</span> JV equity <span>·</span> Preferred equity</div>
+      </div>
+      <div class="tag-group">
+        <div class="tag-label">Beyond Real Estate</div>
+        <div class="tag-row">Private equity <span>·</span> Venture <span>·</span> Credit <span>·</span> Asset-backed</div>
+      </div>
+    </div>
+    <div class="who-skyline" aria-hidden="true">
+      <svg viewBox="0 0 1440 220" preserveAspectRatio="xMidYMax meet" xmlns="http://www.w3.org/2000/svg">
+        <!-- ground line -->
+        <line x1="0" y1="210" x2="1440" y2="210"/>
+        <!-- far skyline layer -->
+        <polyline points="0,210 0,168 48,168 48,148 92,148 92,176 150,176 150,130 196,130 196,162 250,162 250,120 300,120 300,158 360,158 360,138 410,138 410,170 470,170 470,110 520,110 520,150 580,150 580,134 640,134 640,166 700,166 700,118 752,118 752,152 812,152 812,128 868,128 868,162 928,162 928,108 980,108 980,148 1040,148 1040,132 1100,132 1100,164 1160,164 1160,122 1214,122 1214,154 1274,154 1274,138 1334,138 1334,168 1392,168 1392,150 1440,150 1440,210"/>
+        <!-- near towers -->
+        <rect x="120" y="92" width="56" height="118"/>
+        <line x1="148" y1="92" x2="148" y2="74"/>
+        <path d="M120 92 L148 64 L176 92"/>
+        <line x1="132" y1="110" x2="164" y2="110"/>
+        <line x1="132" y1="130" x2="164" y2="130"/>
+        <line x1="132" y1="150" x2="164" y2="150"/>
+        <line x1="132" y1="170" x2="164" y2="170"/>
+        <rect x="430" y="60" width="48" height="150"/>
+        <line x1="454" y1="60" x2="454" y2="40"/>
+        <line x1="440" y1="82" x2="468" y2="82"/>
+        <line x1="440" y1="104" x2="468" y2="104"/>
+        <line x1="440" y1="126" x2="468" y2="126"/>
+        <line x1="440" y1="148" x2="468" y2="148"/>
+        <line x1="440" y1="170" x2="468" y2="170"/>
+        <path d="M700 100 L726 78 L752 100 L752 210 L700 210 Z"/>
+        <line x1="714" y1="118" x2="738" y2="118"/>
+        <line x1="714" y1="140" x2="738" y2="140"/>
+        <line x1="714" y1="162" x2="738" y2="162"/>
+        <line x1="714" y1="184" x2="738" y2="184"/>
+        <rect x="980" y="74" width="60" height="136"/>
+        <line x1="1010" y1="74" x2="1010" y2="52"/>
+        <line x1="994" y1="96" x2="1026" y2="96"/>
+        <line x1="994" y1="120" x2="1026" y2="120"/>
+        <line x1="994" y1="144" x2="1026" y2="144"/>
+        <line x1="994" y1="168" x2="1026" y2="168"/>
+        <rect x="1230" y="100" width="52" height="110"/>
+        <path d="M1230 100 L1256 80 L1282 100"/>
+        <line x1="1242" y1="124" x2="1270" y2="124"/>
+        <line x1="1242" y1="148" x2="1270" y2="148"/>
+        <line x1="1242" y1="172" x2="1270" y2="172"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- SLIDE 5: CTA -->
+  <section class="slide slide-contact">
+    <h2 class="contact-statement reveal">
+      Let's fund<br/>your <em>next project</em>.
+    </h2>
+    <a href="https://calendly.com/contact-clickdreamsstudios/outcome99-meeting" target="_blank" rel="noopener noreferrer" class="cta-button reveal">
+      Book a discovery call
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+    </a>
+    <div class="contact-foot reveal">
+      <div>
+        <div class="contact-label">Inquiry</div>
+        <div class="contact-value"><a href="mailto:hello@outcome99.com">hello@outcome99.com</a></div>
+      </div>
+      <div>
+        <div class="contact-label">Web</div>
+        <div class="contact-value"><a href="https://outcome99.com">outcome99.com</a></div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- CONTROLS -->
+<div class="controls">
+  <div class="progress" id="progress">
+    <div class="progress-bar active" data-i="0" data-label="Welcome" aria-label="Go to Welcome"></div>
+    <div class="progress-bar" data-i="1" data-label="How It Works" aria-label="Go to How It Works"></div>
+    <div class="progress-bar" data-i="2" data-label="Proof" aria-label="Go to Proof"></div>
+    <div class="progress-bar" data-i="3" data-label="Who We Work With" aria-label="Go to Who We Work With"></div>
+    <div class="progress-bar" data-i="4" data-label="Begin" aria-label="Go to Begin"></div>
+    <span class="slide-counter"><span class="current">01</span> &nbsp;/&nbsp; 05</span>
+  </div>
+  <div class="nav-group">
+    <button class="nav-arrow" id="prev" aria-label="Previous">←</button>
+    <button class="nav-arrow" id="next" aria-label="Next">→</button>
+  </div>
+</div>
+
+<div class="footer">
+  <span>© 2026 Outcome99</span>
+  <span>Capital raise advisory · Not securities brokerage</span>
+</div>
+
+<script>
+  /* ───── Intro preloader: liquid logo, then dock to top-left ───── */
+  (function intro() {
+    const pre = document.getElementById('preloader');
+    const preLogo = document.getElementById('preloader-logo');
+    const targetLogo = document.querySelector('.brand-logo');
+    if (!pre || !preLogo || !targetLogo) return;
+
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function finish() {
+      document.body.classList.add('intro-complete');
+      pre.classList.add('done');
+      // remove from DOM after the fade so it can't trap focus/clicks
+      setTimeout(() => pre.remove(), 700);
+    }
+
+    if (reduce) {
+      // No motion: just reveal the site quickly
+      finish();
+      return;
+    }
+
+    function dock() {
+      // Measure where the real logo sits, and the flying logo's current box
+      const from = preLogo.getBoundingClientRect();
+      const to = targetLogo.getBoundingClientRect();
+      const scale = to.width / from.width;
+      // transform-origin is top-left, so translate the top-left corners together
+      const tx = to.left - from.left;
+      const ty = to.top - from.top;
+      preLogo.style.setProperty('--tx', tx + 'px');
+      preLogo.style.setProperty('--ty', ty + 'px');
+      preLogo.style.setProperty('--scale', scale);
+      pre.classList.add('dock');
+      // reveal the real top bar contents as the logo lands
+      const onArrive = (e) => {
+        if (e.propertyName !== 'transform') return;
+        preLogo.removeEventListener('transitionend', onArrive);
+        finish();
+      };
+      preLogo.addEventListener('transitionend', onArrive);
+      // safety fallback in case transitionend doesn't fire
+      setTimeout(finish, 1100);
+    }
+
+    // Let the liquid SMIL animation play (~1.3s), then travel to the corner
+    setTimeout(dock, 1400);
+  })();
+
+  const track = document.getElementById('track');
+  const slides = document.querySelectorAll('.slide');
+  const bars = document.querySelectorAll('.progress-bar');
+  const counter = document.querySelector('.slide-counter .current');
+  const prevBtn = document.getElementById('prev');
+  const nextBtn = document.getElementById('next');
+
+  let current = 0;
+  const total = slides.length;
+  let isAnimating = false;
+
+  function go(i) {
+    if (isAnimating) return;
+    if (i < 0 || i >= total) return;
+    isAnimating = true;
+    current = i;
+    track.style.transform = `translateX(-${current * 100}vw)`;
+
+    slides.forEach((s, idx) => s.classList.toggle('active', idx === current));
+    bars.forEach((b, idx) => b.classList.toggle('active', idx === current));
+    navItems.forEach((n, idx) => n.classList.toggle('current', idx === current));
+    counter.textContent = String(current + 1).padStart(2, '0');
+
+    prevBtn.disabled = current === 0;
+    nextBtn.disabled = current === total - 1;
+
+    setTimeout(() => { isAnimating = false; }, 500);
+  }
+
+  prevBtn.addEventListener('click', () => go(current - 1));
+  nextBtn.addEventListener('click', () => go(current + 1));
+  bars.forEach(b => b.addEventListener('click', () => go(parseInt(b.dataset.i))));
+
+  /* ───── Quick directory / menu overlay ───── */
+  const menuToggle = document.getElementById('menuToggle');
+  const navOverlay = document.getElementById('navOverlay');
+  const navItems = Array.from(document.querySelectorAll('.nav-item'));
+
+  function setMenu(open) {
+    navOverlay.classList.toggle('open', open);
+    navOverlay.setAttribute('aria-hidden', open ? 'false' : 'true');
+    menuToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+  menuToggle.addEventListener('click', () => setMenu(!navOverlay.classList.contains('open')));
+  menuToggle.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setMenu(!navOverlay.classList.contains('open')); }
+  });
+  navItems.forEach(item => {
+    item.addEventListener('click', () => {
+      const i = parseInt(item.dataset.i);
+      setMenu(false);
+      // wait for the overlay fade so the slide transition reads cleanly
+      setTimeout(() => { isAnimating = false; go(i); }, 120);
+    });
+  });
+  // Esc closes the menu; clicking the backdrop closes too
+  navOverlay.addEventListener('click', (e) => { if (e.target === navOverlay) setMenu(false); });
+  window.addEventListener('keydown', (e) => { if (e.key === 'Escape') setMenu(false); });
+
+  let wheelLock = false;
+  window.addEventListener('wheel', (e) => {
+    if (wheelLock || isAnimating) return;
+    const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+    if (Math.abs(delta) < 20) return;
+    wheelLock = true;
+    if (delta > 0) go(current + 1);
+    else go(current - 1);
+    setTimeout(() => { wheelLock = false; }, 550);
+  }, { passive: true });
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === 'PageDown') go(current + 1);
+    if (e.key === 'ArrowLeft' || e.key === 'PageUp') go(current - 1);
+  });
+
+  let touchStartX = 0;
+  let touchStartY = 0;
+  window.addEventListener('touchstart', (e) => {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+  window.addEventListener('touchend', (e) => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    const dy = e.changedTouches[0].clientY - touchStartY;
+    // Only navigate on a clearly horizontal swipe; let vertical gestures scroll the panel
+    if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy) * 1.2) return;
+    if (dx < 0) go(current + 1);
+    else go(current - 1);
+  }, { passive: true });
+
+  go(0);
+</script>
+
+</body>
+</html>
